@@ -61,6 +61,44 @@ Base URL for most endpoints: `https://app.silentpush.com` and `https://api.silen
 
 ---
 
+## SPQL Datasources
+
+SPQL queries run against the `/api/v1/merge-api/explore/scandata/search/raw` endpoint. By default a query searches webscan data, but you can scope it to a specific datasource by prefixing your query with `datasource=<name> AND ...`. Beware that different datasources have different availible fields.
+
+### Available Datasources
+
+| Datasource | Description |
+|---|---|
+| `webscan` | Standard web scan data — HTML, favicons, SSL certs, headers, redirect chains |
+| `torscan` | Web scan data collected through the Tor network |
+| `services` | Port/service scan data (open ports, banners, service fingerprints) |
+| `opendirectory` | Detected open directory listings on web servers |
+| `whois` | Whois records collected by Silent Push |
+
+### Query Syntax Examples
+
+```python
+# Search a single datasource
+query = "datasource=webscan AND favicon_murmur3 = 309020573"
+
+# Search multiple datasources at once
+query = "datasource=webscan,torscan AND domain = 'example.com'"
+
+# No datasource prefix — searches across all datasources
+query = "ip = '8.8.8.8'"
+
+# Combine datasource scope with field filters
+query = "datasource=services AND asn = 15169 AND domain LIKE '%.google.%'"
+
+# Find self-signed certs on newly registered domains (webscan only)
+query = "datasource=webscan AND domain_age < 30 AND cert_is_self_signed = true"
+
+# Find all WHOIS records for a specific domain
+query = datasource=whois AND domain = "silentpush.com""
+```
+
+Full field reference: [SPQL Docs](https://help.silentpush.com/docs/spql-api)
+
 ## Requirements
 
 - Python 3.9+
